@@ -1,0 +1,30 @@
+source "https://rubygems.org"
+
+git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
+
+# REPL / debugger
+gem "pry", '~> 0.11.3'
+
+# Supposed to drop into pry as a debugger on unhandled exceptions, but I 
+# haven't gotten to test it yet
+gem "pry-rescue", '~> 1.4.5'
+
+# Move around the stack when you debug with `pry`, really sweet
+gem "pry-stack_explorer", '~> 0.4.9'
+
+# Provider for `commonmarker`, the new GFM lib
+gem 'yard-commonmarker', '~> 0.5.0'
+
+# My `yard clean` command
+gem 'yard-clean', '~> 0.1.0'
+
+# The gem
+gem 'yard-typedef', path: '../..'
+
+
+# Gems needed to support Ruby debugging in VSCode. Just export this ENV var
+# somewhere to enable installation.
+if ENV[ "VSCODE_RUBY_DEBUG" ]
+  gem 'ruby-debug-ide', '>= 0.6.0'
+  gem 'debase', '>= 0.2.1'
+end

@@ -1,0 +1,7 @@
+--load ./support/yard_helper.rb
+--markup-provider commonmarker
+--markup markdown
+--plugin yard-commonmarker
+--plugin yard-typedef
+--plugin yard-clean
+lib/**/*.rb

@@ -54,21 +54,24 @@ module  Typedef
   }.freeze
   
   
+  TAG_NAME = :typedef
+  
+  
   # How typedef references start.
   # 
   # @return [::String]
   # 
-  REF_START = '@type:'
+  REF_PREFIX = '@type:'
   
   
   # {::Regexp} used to extract typedef references.
   # 
-  # @see .extract_refs
+  # @see .extract_names_from_refs
   # 
   # @return [::Regexp]
   # 
   REF_REGEXP = \
-    /#{ Regexp.escape REF_START }((?:::)?[A-Z][A-Za-z_]*(?:::[A-Z][A-Za-z_]*)*)/
+    /#{ Regexp.escape REF_PREFIX }((?:::)?[A-Z][A-Za-z_]*(?:::[A-Z][A-Za-z_]*)*)/
   
   
   # Singleton Methods
@@ -90,35 +93,99 @@ module  Typedef
     unless YARD::Templates::Template.extra_includes.include? HELPER_FOR_OPTIONS
       YARD::Templates::Template.extra_includes << HELPER_FOR_OPTIONS
     end
+    
+    YARD::Tags::Library.define_tag "Type Aliases", TAG_NAME, :with_types_and_name
 
     nil
   end # .install!
   
   
+  # Extract typedef names from any references in a type string.
+  # 
   # @example Relative refs
-  #   extract_refs "@type:Name"
+  #   extract_names_from_refs "@type:Name"
   #   #=> [ "Name" ]
   #   
-  #   extract_refs "@type:Some::Mod::Type"
+  #   extract_names_from_refs "@type:Some::Mod::Type"
   #   #=> [ "Some::Mod::Type" ]
   # 
   # @example Absolute refs
-  #   extract_refs "@type:::Top::Mod::Type"
+  #   extract_names_from_refs "@type:::Top::Mod::Type"
   #   #=> [ "::Top::Mod::Type" ]
   # 
   # @example Multiple refs
-  #   extract_refs "Hash<@type:Name, @type:::Abs::Value> | @type:Other::Type"
+  #   extract_names_from_refs "Hash<@type:Name, @type:::Abs::Value> | @type:Other::Type"
   #   #=> [ "Name", "::Abs::Value", "Other::Type" ]
   # 
   # @example No refs
-  #   extract_refs "::Hash<::Symbol, Some::Class>"
+  #   extract_names_from_refs "::Hash<::Symbol, Some::Class>"
   #   #=> []
   # 
   # @param [::String] type
   #   Type string.
   # 
-  def self.extract_refs type
-    type.scan( REF_REGEXP ).flatten
+  # @return [::Array<::String>]
+  #   Extracted typedef names.
+  # 
+  def self.extract_names_from_refs type
+    type.scan( REF_REGEXP ).flatten.uniq
+  end
+  
+  
+  def self.tag_by_name_from code_object, typedef_name
+    tags = \
+      code_object.tags( TAG_NAME ).select { |tag| tag.name == typedef_name }
+    
+    case tags.length
+    when 0
+      nil
+    when 1
+      tags[ 0 ]
+    else
+      log.warn "@typedef tag #{ typedef_name } defined multiple times in #{ code_object }"
+      tags[ -1 ]
+    end
+  end
+  
+  
+  def self.resolve_bare_name_from code_object, bare_name
+    current = code_object
+    
+    until current == ::YARD::Registry.root
+      if (tag = tag_by_name_from( current, bare_name ))
+        return tag.types[ 0 ]
+      end
+      
+      current = current.namespace
+    end
+    
+    log.warn "Unable to resolve typedef ref #{ bare_name } in #{ code_object }"
+    
+    nil
+  end
+  
+  
+  def self.resolve_ref template, typedef_name
+    typedef_namespace, _, bare_name = typedef_name.rpartition '::'
+    
+    if typedef_namespace == ''
+      return \
+        resolve_bare_name_from( template.object, bare_name ) || typedef_name
+    end
+    
+    typedef_namespace_object = \
+      YARD::Registry.resolve template.object.namespace, typedef_namespace
+    
+    tag = tag_by_name_from typedef_namespace_object, bare_name
+    
+    return tag.types[ 0 ] if tag
+    
+    log.warn \
+      "Unable to resolve typedef ref #{ typedef_name } in #{ template.object }"
+    
+    binding.pry
+    
+    typedef_name
   end
   
   
@@ -126,7 +193,14 @@ module  Typedef
     # This is how YARD tests if the list needs process, so I do the same
     return types unless types.is_a?( ::Array )
     
-    return types
+    types.map do |type|
+      extract_names_from_refs( type ).
+        reduce( type ) { |type, typedef_name|
+          type.gsub \
+            "#{ REF_PREFIX }#{ typedef_name }",
+            resolve_ref( template, typedef_name )
+        }
+    end
   end
   
   
