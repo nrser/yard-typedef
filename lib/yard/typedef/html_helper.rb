@@ -35,16 +35,7 @@ module  Typedef
 # 
 module HtmlHelper
 
-  # The {Proc} we pass to 
-  # 
-  # @return [Proc]
-  # 
-  INCLUDE_FILTER = proc do |options|
-    HtmlHelper if options.format == :html
-  end
-
-
-   # Formats a list of types from a tag.
+  # Formats a list of types from a tag.
   #
   # @param [Array<String>, FalseClass] typelist
   #   the list of types to be formatted.
@@ -56,27 +47,12 @@ module HtmlHelper
   #   as [Type1, Type2, ...] with the types linked
   #   to their respective descriptions.
   #
-  def format_types(typelist, brackets = true)
-    return unless typelist.is_a?(Array)
-    
-    resolved_typelist = typelist.
-      map { |type|
-        if type.start_with? "@type:"
-          typedef_name = type[ "@type:".length..-1 ]
-          
-          if (typedef = resolve_typedef( typedef_name ))
-            typedef
-          else
-            log.warn "Unable to resolve typedef ref #{ type } in #{ object }"
-            type
-          end
-        else
-          type
-        end
-      }
-
-    super( resolved_typelist, brackets )
-  end
+  def format_types typelist, brackets = true
+    super(
+      ::YARD::Typedef.expand_refs( self, typelist ),
+      brackets
+    )
+  end # #format_types
 
 end # module HtmlHelper
 
