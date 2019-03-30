@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = [ "nrser" ]
   spec.email         = [ "neil@neilsouza.com" ]
 
-  spec.summary       = %q{A YARD plugin to define and use type }
+  spec.summary       = %q{A YARD plugin to define and use type definitions}
   # spec.description   = 
   spec.homepage      = "https://github.com/nrser/yard-typedef"
   spec.license       = "BSD"
