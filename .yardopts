@@ -1,0 +1,14 @@
+--output-dir ./site
+--markup-provider commonmarker
+--markup markdown
+--plugin yard-commonmarker
+--plugin yard-typedef
+--plugin yard-doctest
+--plugin yard-clean
+--private
+--protected
+lib/**/*.rb
+-
+README.md
+LICENSE.txt
+doc/**/*.md

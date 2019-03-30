@@ -1,0 +1,65 @@
+##############################################################################
+# BEGIN Ruby.gitingore
+#
+# General Git ignore file for Ruby, including support for:
+# 
+# -   Bundler
+# -   RDoc and Yard
+# -   RBEnv and RVM
+# -   DotEnv (optional)
+# 
+# Additional support is available in separate ignore files:
+# 
+# -   Gem.gitignore (for gem source directories)
+# -   Rails.gitignore
+# -   RubyMotion.gitignore
+# 
+
+/*.gem
+*.rbc
+/.config
+/coverage/
+/InstalledFiles
+/pkg/
+/spec/reports/
+/spec/examples.txt
+/test/tmp/
+/test/version_tmp/
+/tmp/
+
+# Used by dotenv library to load environment variables.
+# .env
+
+## Documentation cache and generated files:
+/.yardoc/
+/_yardoc/
+#/doc/ # I like /site/
+/site/
+/rdoc/
+
+## Environment normalization:
+.bundle/
+/vendor/bundle
+/lib/bundler/man/
+
+# for a library or gem, add `Gem.gitignore`
+
+# unless supporting rvm < 1.11.0 or doing something fancy, ignore this:
+.rvmrc
+#
+# END Ruby.gitingore
+##############################################################################
+
+##############################################################################
+# BEGIN Gem.gitignore
+#
+/Gemfile.lock
+/.ruby-version
+/.ruby-gemset
+#
+# END Gem.gitignore
+##############################################################################
+
+# Project Patterns
+# ============================================================================
+
