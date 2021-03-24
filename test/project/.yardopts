@@ -4,4 +4,5 @@
 --plugin yard-commonmarker
 --plugin yard-typedef
 --plugin yard-clean
+--plugin yard-link_stdlib
 lib/**/*.rb

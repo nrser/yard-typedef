@@ -90,11 +90,13 @@ module  Typedef
     #       at the moment.
     log.debug "Installing `yard-typedef` plugin..."
 
-    unless YARD::Templates::Template.extra_includes.include? HELPER_FOR_OPTIONS
-      YARD::Templates::Template.extra_includes << HELPER_FOR_OPTIONS
-    end
+    YARD::Templates::Template.extra_includes << HELPER_FOR_OPTIONS
     
     YARD::Tags::Library.define_tag "Type Aliases", TAG_NAME, :with_types_and_name
+    
+    # This registered template works for yardoc
+    YARD::Templates::Engine.register_template_path \
+      ROOT.join( 'templates' ).to_s
 
     nil
   end # .install!
@@ -169,8 +171,11 @@ module  Typedef
     typedef_namespace, _, bare_name = typedef_name.rpartition '::'
     
     if typedef_namespace == ''
-      return \
-        resolve_bare_name_from( template.object, bare_name ) || typedef_name
+      expansion = resolve_bare_name_from( template.object, bare_name )
+      
+      return typedef_name if expansion.nil?
+      
+      return "<emph>#{ expansion }</emph>"
     end
     
     typedef_namespace_object = \
@@ -182,8 +187,6 @@ module  Typedef
     
     log.warn \
       "Unable to resolve typedef ref #{ typedef_name } in #{ template.object }"
-    
-    binding.pry
     
     typedef_name
   end

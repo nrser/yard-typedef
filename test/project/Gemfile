@@ -18,6 +18,8 @@ gem 'yard-commonmarker', '~> 0.5.0'
 # My `yard clean` command
 gem 'yard-clean', '~> 0.1.0'
 
+gem 'yard-link_stdlib'
+
 # The gem
 gem 'yard-typedef', path: '../..'
 

@@ -12,14 +12,21 @@
 # @typedef [::Symbol | ::String] Name
 #   A name of something.
 # 
+# @typedef [::Proc<(@type:Name) → ::String>] Transformer
+#   {::Proc} that transforms strings.
+# 
 module Test
   
   # Doesn't do anything.
   # 
   # @param [@type:Name] name1
+  #   First name. It's a {type:Name}.
+  # 
   # @param [@type:::Test::Name] name2
   # @param [@type:Test::Name] name3
-  # @param [@type:ChildA::Blah] blah
+  # 
+  # @param [@type:Transformer] blah
+  # @param [@alias:Transformer] blah
   # 
   # @return nil
   #  

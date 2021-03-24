@@ -1,0 +1,16 @@
+<div class="typedef_summary">
+  <h2>Type Aliases</h2>
+
+  <% @typedef_tags.each do |tag | %>
+    <p class="typedef_summary-tag">
+      <h3><%= h tag.name %></h3>
+      
+      <span class='type'><%= format_types(tag.types, false) %></span>
+        
+      <% if tag.text && !tag.text.empty? %>
+        <%= htmlify_line(tag.text) %>
+      <% end %>
+    </p>
+  <% end %>
+  
+</div>
